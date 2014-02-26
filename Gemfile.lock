@@ -1,0 +1,22 @@
+PATH
+  remote: .
+  specs:
+    shipwire (0.1)
+      builder
+      httparty (~> 0.13.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    builder (3.1.4)
+    httparty (0.13.0)
+      json (~> 1.8)
+      multi_xml (>= 0.5.2)
+    json (1.8.1)
+    multi_xml (0.5.5)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  shipwire!
