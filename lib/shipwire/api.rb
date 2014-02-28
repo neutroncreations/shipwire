@@ -58,13 +58,8 @@ module Shipwire
           xml_rate_request.Password @config.password
 
           orders.each do |order|
-            xml_rate_request.Order do |xml_order|
-              xml_order.AddressInfo(type: :ship) do |xml_address|
-
-                order.address.each do |k,v|
-                  xml_address.tag! k.to_s.capitalize, v
-                end
-              end
+            xml_rate_request.Order(id: order.id) do |xml_order|
+              xml_order << order.address.to_xml
 
               order.items.each_with_index do |item, index|
                 xml_order.Item(num: index) do |xml_item|

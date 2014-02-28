@@ -11,8 +11,10 @@ Gem::Specification.new do |s|
   s.summary     = "Ruby bindings for the Shipwire API."
   s.description = "Enterprise logistics for everyone."
 
-  s.files = `git ls-files`.split("\n")
+  s.files         = `git ls-files`.split("\n")
   s.require_paths = ['lib']
+
+  s.licenses = ['MIT']
 
   s.add_dependency "httparty", "~> 0.13.0"
   s.add_dependency "builder"

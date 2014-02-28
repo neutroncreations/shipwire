@@ -1,15 +1,16 @@
 module Shipwire
   class Order
 
-    ADDRESS_FIELDS = [:name, :company, :address, :ddress, :address, :city, :state, :country, :zip, :commercial, :pobox].freeze
-
     attr_accessor :shipping
     attr_accessor :warehouse
     attr_reader   :id
     attr_reader   :address
     attr_reader   :items
 
-    def initialize id
+    # Creates a new Shipwire::Order
+    #
+    # @param [String] id the order id to be passed to the Shipwire API
+    def initialize id=nil
       @config = Shipwire::Config.instance
 
       @warehouse = @config.default_warehouse
@@ -19,17 +20,24 @@ module Shipwire
       @items = []
     end
 
-    def address= address_data
+    # set the address for the order
+    #
+    # The shipwire API
+    #
+    # @param [Shipwire::Address] adddress the address to set for this order
+    # @return [Shipwire::Order] this Shipwire::Order object
+    def address= address
 
-      raise InvalidAddressError.new unless address_data.is_a? Hash
+      raise InvalidAddressError.new unless address.is_a? Shipwire::Address
 
-      raise InvalidAddressError.new('Address line 1 is required') if address_data[:address1].nil?
-      raise InvalidAddressError.new('City is required') if address_data[:city].nil?
-      raise InvalidAddressError.new('Country is required') if address_data[:country].nil?
+      @address = address
 
-      @address = address_data.select
+      self
     end
 
+    # add an item to the order
+    #
+    # @param [Shipwire::OrderItem] item the item to be added to the order
     def add_item item
       raise new InvalidItemError unless item.is_a? Shipwire::OrderItem
 
