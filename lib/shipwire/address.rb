@@ -15,7 +15,10 @@ module Shipwire
       pobox: :PoBox
     }
 
-    def initialize fields={}
+    # @param [Boolean] validate perform validation of the address
+    def initialize fields={}, validate = true
+      @validate = validate
+
       @fields = {}
 
       ADDRESS_FIELDS.keys.each do |field|
@@ -24,9 +27,9 @@ module Shipwire
     end
 
     def to_xml
-      raise InvalidAddressError.new('Address line 1 is required') if @fields[:address1].nil?
-      raise InvalidAddressError.new('City is required') if @fields[:city].nil?
-      raise InvalidAddressError.new('Country is required') if @fields[:country].nil?
+      raise InvalidAddressError.new('Address line 1 is required') if @validate && @fields[:address1].nil?
+      raise InvalidAddressError.new('City is required') if @validate && @fields[:city].nil?
+      raise InvalidAddressError.new('Country is required') if @validate && @fields[:country].nil?
 
       xml = Builder::XmlMarkup.new indent: 2, initial: 2
       xml.AddressInfo(type: :ship) do |address|
