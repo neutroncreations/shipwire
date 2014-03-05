@@ -43,7 +43,7 @@ module Shipwire
           end
         rescue HTTParty::Error => e
           raise ApiError.new(e.message)
-        rescue Net::OpenTimeout =>
+        rescue Net::OpenTimeout => e
           raise ApiTimeout.new(e.message)
         end
       end
