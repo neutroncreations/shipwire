@@ -19,7 +19,6 @@ module Shipwire
 
     attr_accessor :username
 
-
     attr_accessor :password
 
     # What environment should we be working in
@@ -36,6 +35,17 @@ module Shipwire
     # 00 - Use best available
     attr_accessor :default_warehouse
     @default_warehouse = '00'
+
+    # The timeout for requests to the API, in seconds
+    #
+    # Any request taking longer that this will raise a Shipwire::Timeout Error
+    #
+    # Defaults to 10
+    attr_accessor :timeout
+    @timeout = 10
+
+    attr_accessor :debug
+    @debug = (defined? Rails ? Rails.env.development? : false)
 
     def environment
       case @environment

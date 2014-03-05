@@ -31,6 +31,8 @@ module Shipwire
 
       def perform path, root, options
 
+        options[:timeout] = @config.timeout
+
         begin
           response = self.class.post "#{base_url}#{path}", options
 
@@ -41,6 +43,8 @@ module Shipwire
           end
         rescue HTTParty::Error => e
           raise ApiError.new(e.message)
+        rescue Net::OpenTimeout =>
+          raise ApiTimeout.new(e.message)
         end
       end
 
