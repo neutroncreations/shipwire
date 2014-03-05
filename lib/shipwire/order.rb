@@ -24,7 +24,7 @@ module Shipwire
     #
     # The shipwire API
     #
-    # @param [Shipwire::Address] adddress the address to set for this order
+    # @param [Shipwire::Address] address the address to set for this order
     # @return [Shipwire::Order] this Shipwire::Order object
     def address= address
 
