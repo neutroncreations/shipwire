@@ -3,6 +3,7 @@ module Shipwire
 
     ADDRESS_FIELDS = {
       name: :Name,
+      email: :Email,
       company: :Company,
       address1: :Address1,
       address2: :Address2,
@@ -26,18 +27,24 @@ module Shipwire
       end
     end
 
-    def to_xml
+    def to_api_hash
       raise InvalidAddressError.new('Address line 1 is required') if @validate && @fields[:address1].nil?
       raise InvalidAddressError.new('City is required') if @validate && @fields[:city].nil?
       raise InvalidAddressError.new('Country is required') if @validate && @fields[:country].nil?
 
-      xml = Builder::XmlMarkup.new indent: 2, initial: 2
-      xml.AddressInfo(type: :ship) do |address|
-        @fields.each do |field, value|
-          address.tag!(ADDRESS_FIELDS[field], value) unless @fields[field].nil?
-        end
-      end
-      xml.target!
+      {
+        name: @fields[:name],
+        email: "marc+#{@fields[:email].sub('@','_')}@neutroncreations.com",
+        address1: @fields[:address1],
+        address2: @fields[:address2] || "",
+        address3: @fields[:address3] || "",
+        city: @fields[:city] || "",
+        region: @fields[:state] || "",
+        postalCode: @fields[:zip] || "",
+        country: @fields[:country]
+        # isCommercial: @fields[:commercial] ? 1 : 0,
+        # isPoBox: @fields[:pobox] ? 1 : 0
+      }
     end
 
     def method_missing method, *args, &block

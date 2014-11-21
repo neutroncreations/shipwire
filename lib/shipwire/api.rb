@@ -1,7 +1,7 @@
 module Shipwire
   class Api
     include HTTParty
-    format :xml
+    format :json
 
 
     URL_BASE = {
@@ -13,33 +13,60 @@ module Shipwire
       @config = Shipwire::Config.instance
     end
 
-    def rate orders
+    def rate order
 
-      orders = [orders] unless orders.is_a? Array
-
-      xml = build_rate orders
-
-      options = {
-        body: xml
+      json = {
+        order: {
+          shipTo: order.address.to_api_hash,
+          items: []
+        }
       }
 
-      perform '/exec/RateServices.php', 'RateResponse', options
+      order.items.each do |item|
+        json[:order][:items].push({
+          sku: item.sku,
+          quantity: item.qty
+        })
+      end
+
+      perform :post, '/api/v3/rate', {body: json.to_json}
+
+    end
+
+    def order! order
+
+      json = {
+        orderNo: order.id,
+        shipTo: order.address.to_api_hash,
+        items: []
+      }
+
+      order.items.each do |item|
+        json[:items].push({
+          sku: item.sku,
+          quantity: item.qty
+        })
+      end
+
+      print json.to_json
+
+      perform :post, '/api/v3/orders', {body: json.to_json}
 
     end
 
     private
 
-      def perform path, root, options
+      def perform method, path, options
 
         options[:timeout] = @config.timeout
 
         begin
-          response = self.class.post "#{base_url}#{path}", options
+          response = self.class.send method, "#{base_url}#{path}", options.merge(headers)
 
-          if response[root]['Status'] == 'OK'
+          if response['status'] == 200
             return response.parsed_response
           else
-            raise ApiError.new(response[root])
+            raise ApiError.new(response.parsed_response)
           end
         rescue HTTParty::Error => e
           raise ApiError.new(e.message)
@@ -52,32 +79,17 @@ module Shipwire
         URL_BASE[@config.environment]
       end
 
-      def build_rate orders
-        xml = Builder::XmlMarkup.new indent: 2
-        xml.instruct! :xml, :version=>"1.0", :encoding=>"UTF-8"
-        xml.declare! :DOCTYPE, :RateRequest, :SYSTEM, "http://www.shipwire.com/exec/download/RateRequest.dtd"
-
-        xml.RateRequest do |xml_rate_request|
-          xml_rate_request.Username @config.username
-          xml_rate_request.Password @config.password
-
-          orders.each do |order|
-            xml_rate_request.Order(id: order.id) do |xml_order|
-              xml_order << order.address.to_xml
-
-              order.items.each_with_index do |item, index|
-                xml_order.Item(num: index) do |xml_item|
-                  xml_item.Code item.sku
-                  xml_item.Quantity item.qty
-                end
-              end
-            end
-          end
-        end
-
-        print xml.target! if @config.debug
-
-        return xml.target!
+      def headers
+        {
+          headers: {
+            'Content-Type' => 'application/json'
+          },
+          basic_auth: {
+            username: @config.username,
+            password: @config.password
+          }
+        }
       end
+
   end
 end
