@@ -34,7 +34,7 @@ module Shipwire
 
       {
         name: @fields[:name],
-        email: "marc+#{@fields[:email].sub('@','_')}@neutroncreations.com",
+        email: @fields[:email],
         address1: @fields[:address1],
         address2: @fields[:address2] || "",
         address3: @fields[:address3] || "",
