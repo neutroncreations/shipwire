@@ -48,8 +48,6 @@ module Shipwire
         })
       end
 
-      print json.to_json
-
       perform :post, '/api/v3/orders', {body: json.to_json}
 
     end
